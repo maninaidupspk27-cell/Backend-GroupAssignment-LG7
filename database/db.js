@@ -25,36 +25,69 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
   }
 });
 
+const DEFAULT_SCHEMA_SQL = `
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS guests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    phone TEXT
+);
+
+CREATE TABLE IF NOT EXISTS games (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    min_players INTEGER NOT NULL,
+    max_players INTEGER NOT NULL,
+    duration_minutes INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS bookings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    guest_id INTEGER NOT NULL,
+    game_id INTEGER NOT NULL,
+    start_date TEXT NOT NULL,
+    end_date TEXT NOT NULL,
+    FOREIGN KEY (guest_id) REFERENCES guests(id) ON DELETE RESTRICT,
+    FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE RESTRICT
+);
+`;
+
 // Helper function to initialize schema
-function initDb() {
+async function initDb() {
   return new Promise((resolve, reject) => {
+    let schemaSql = DEFAULT_SCHEMA_SQL;
     try {
-      const schemaSql = fs.readFileSync(SCHEMA_PATH, 'utf-8');
-      db.exec(schemaSql, async (err) => {
-        if (err) {
-          console.error('[-] Error executing schema.sql:', err.message);
-          return reject(err);
-        }
-
-        // On Vercel serverless cold start, auto-seed the database if tables are empty
-        if (process.env.VERCEL) {
-          try {
-            const countRow = await query.get('SELECT COUNT(*) AS count FROM games');
-            if (!countRow || countRow.count < 30) {
-              const { seedDatabase } = require('./seed');
-              await seedDatabase();
-            }
-          } catch (seedErr) {
-            console.error('[-] Vercel auto-seed notification:', seedErr.message);
-          }
-        }
-
-        resolve();
-      });
-    } catch (readErr) {
-      console.error('[-] Error reading schema.sql:', readErr.message);
-      reject(readErr);
+      if (fs.existsSync(SCHEMA_PATH)) {
+        schemaSql = fs.readFileSync(SCHEMA_PATH, 'utf-8');
+      }
+    } catch (e) {
+      // Fallback to embedded schema string
+      schemaSql = DEFAULT_SCHEMA_SQL;
     }
+
+    db.exec(schemaSql, async (err) => {
+      if (err) {
+        console.error('[-] Error executing schema:', err.message);
+        return reject(err);
+      }
+
+      // On Vercel serverless cold start, auto-seed the database if tables are empty
+      if (process.env.VERCEL) {
+        try {
+          const countRow = await query.get('SELECT COUNT(*) AS count FROM games');
+          if (!countRow || countRow.count < 30) {
+            const { seedDatabase } = require('./seed');
+            await seedDatabase();
+          }
+        } catch (seedErr) {
+          console.error('[-] Vercel auto-seed notification:', seedErr.message);
+        }
+      }
+
+      resolve();
+    });
   });
 }
 

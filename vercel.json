@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "database/**,node_modules/sqlite3/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
