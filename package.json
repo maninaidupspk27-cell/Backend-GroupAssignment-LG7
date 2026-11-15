@@ -1,0 +1,27 @@
+{
+  "name": "booknook-cafe",
+  "version": "1.0.0",
+  "description": "BookNook Cafe - Board Game Booking Management System (Backend Fundamentals)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node database/seed.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "express",
+    "sqlite3",
+    "backend",
+    "rest-api",
+    "board-games",
+    "booknook-cafe"
+  ],
+  "author": "Group 7 (YG-CSEDS2B-G07)",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.3.0",
+    "sqlite3": "^6.0.1"
+  }
+}

@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# SQLite Database and Journal Files
+database/*.db
+database/*.db-journal
+database/*.db-wal
+database/*.db-shm
+*.db
+*.db-journal
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS and Environment
+.env
+.DS_Store
+Thumbs.db
