@@ -1,0 +1,675 @@
+{
+  "info": {
+    "_postman_id": "b3c69d80-5a23-4e89-9134-booknookcafe",
+    "name": "BookNook Cafe API Testing",
+    "description": "Comprehensive Postman test collection for BookNook Cafe – Board Game Booking Management System (Backend Fundamentals Group Assignment YG-CSEDS2B-G07). Includes all CRUD endpoints, SQL JOIN booking details, capacity search, and the Free on this date Special Twist scenarios.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Guest APIs",
+      "item": [
+        {
+          "name": "1. Get all guests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/guests",
+              "host": ["{{baseUrl}}"],
+              "path": ["guests"]
+            },
+            "description": "Retrieve all registered guests (at least 30 records)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns at least 30 guest records', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(30);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Get guest by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/guests/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["guests", "1"]
+            },
+            "description": "Retrieve a specific guest by their primary key ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Guest has id, name, and email', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql(1);",
+                  "    pm.expect(jsonData).to.have.property('name');",
+                  "    pm.expect(jsonData).to.have.property('email');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Add guest",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sameer Joshi\",\n  \"email\": \"sameer.joshi@example.com\",\n  \"phone\": \"+91-9876543299\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/guests",
+              "host": ["{{baseUrl}}"],
+              "path": ["guests"]
+            },
+            "description": "Add a new guest with valid name, unique email, and phone."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created or 409 if already exists', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+                  "});",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.name).to.eql('Sameer Joshi');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Update guest",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Sharma (Updated)\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"+91-9876543200\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/guests/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["guests", "1"]
+            },
+            "description": "Update guest information by ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Guest updated successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql(1);",
+                  "    pm.expect(jsonData.name).to.include('Updated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Delete guest",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/guests/999",
+              "host": ["{{baseUrl}}"],
+              "path": ["guests", "999"]
+            },
+            "description": "Attempt to delete a guest. Demonstrates 404 for non-existent, 409 if bookings exist, or 200 if deleted."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 (Not Found) or 200 (Deleted)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404, 409]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Game APIs",
+      "item": [
+        {
+          "name": "6. Get all games",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["games"]
+            },
+            "description": "Retrieve all games cataloged in the cafe (at least 30 records)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns at least 30 games', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.at.least(30);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "7. Get game by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games/14",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "14"]
+            },
+            "description": "Retrieve Game 14 by ID (Mandatory Game)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Game 14 verified', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql(14);",
+                  "    pm.expect(jsonData.name).to.eql('Game 14');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "8. Add game",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Root: A Game of Woodland Might\",\n  \"min_players\": 2,\n  \"max_players\": 4,\n  \"duration_minutes\": 90\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["games"]
+            },
+            "description": "Add a new board game to the catalog."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Created game returned with ID', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.name).to.eql('Root: A Game of Woodland Might');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "9. Update game",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Game 14\",\n  \"min_players\": 2,\n  \"max_players\": 5,\n  \"duration_minutes\": 75\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/games/14",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "14"]
+            },
+            "description": "Update an existing game by ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Game updated successfully', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql(14);",
+                  "    pm.expect(jsonData.max_players).to.eql(5);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "10. Delete game",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games/999",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "999"]
+            },
+            "description": "Delete a game by ID (safe deletion checking existing bookings)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404, 409, or 200', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404, 409]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "11. Search games by players",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games?players=4",
+              "host": ["{{baseUrl}}"],
+              "path": ["games"],
+              "query": [
+                {
+                  "key": "players",
+                  "value": "4"
+                }
+              ]
+            },
+            "description": "Search games capable of accommodating 4 players (min_players <= 4 AND max_players >= 4)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('All returned games accommodate 4 players', function () {",
+                  "    var games = pm.response.json();",
+                  "    pm.expect(games).to.be.an('array');",
+                  "    games.forEach(function(g) {",
+                  "        pm.expect(g.min_players).to.be.at.most(4);",
+                  "        pm.expect(g.max_players).to.be.at.least(4);",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Booking APIs",
+      "item": [
+        {
+          "name": "12. Get all bookings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            },
+            "description": "Retrieve all bookings in the system (at least 30 records)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns at least 30 bookings', function () {",
+                  "    var bookings = pm.response.json();",
+                  "    pm.expect(bookings).to.be.an('array');",
+                  "    pm.expect(bookings.length).to.be.at.least(30);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "13. Create booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guest_id\": 2,\n  \"game_id\": 1,\n  \"start_date\": \"2026-12-01\",\n  \"end_date\": \"2026-12-03\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            },
+            "description": "Create a valid booking with non-overlapping dates."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created or 409 Conflict', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 409]);",
+                  "});",
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData.guest_id).to.eql(2);",
+                  "    pm.expect(jsonData.game_id).to.eql(1);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "14. Get booking details using JOIN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/bookings/details",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "details"]
+            },
+            "description": "Retrieve joined booking records with guest_name and game_name."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Booking details contain joined guest_name and game_name', function () {",
+                  "    var details = pm.response.json();",
+                  "    pm.expect(details).to.be.an('array');",
+                  "    pm.expect(details.length).to.be.at.least(1);",
+                  "    var item = details[0];",
+                  "    pm.expect(item).to.have.property('booking_id');",
+                  "    pm.expect(item).to.have.property('guest_name');",
+                  "    pm.expect(item).to.have.property('game_name');",
+                  "    pm.expect(item).to.have.property('start_date');",
+                  "    pm.expect(item).to.have.property('end_date');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Special Twist - Free On This Date",
+      "item": [
+        {
+          "name": "15. Get available games by date",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games/available?date=2026-11-20",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "available"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-11-20"
+                }
+              ]
+            },
+            "description": "Query games available on a given date (no active booking covering that date)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Returns an array of available games', function () {",
+                  "    var games = pm.response.json();",
+                  "    pm.expect(games).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "16. Invalid booking date test (MANDATORY TEST 1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guest_id\": 1,\n  \"game_id\": 14,\n  \"start_date\": \"2026-11-12\",\n  \"end_date\": \"2026-11-10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            },
+            "description": "MANDATORY TEST 1: End date before start date must return HTTP 400 with 'End date cannot be before start date.'"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('MANDATORY TEST 1: Status code is 400 Bad Request', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('MANDATORY TEST 1: Response contains exact error message', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.error).to.include('End date cannot be before start date.');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "17. Check Game 14 availability on November 11 (MANDATORY TEST 2)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games/available?date=2026-11-11",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "available"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-11-11"
+                }
+              ]
+            },
+            "description": "MANDATORY TEST 2: Game 14 is booked from 2026-11-10 to 2026-11-12, so on 2026-11-11 it MUST NOT appear."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('MANDATORY TEST 2: Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('MANDATORY TEST 2: Game 14 is NOT in the available games list', function () {",
+                  "    var games = pm.response.json();",
+                  "    pm.expect(games).to.be.an('array');",
+                  "    var game14 = games.find(function(g) { return g.id === 14; });",
+                  "    pm.expect(game14).to.be.undefined;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "18. Check Game 14 availability on November 13 (MANDATORY TEST 3)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/games/available?date=2026-11-13",
+              "host": ["{{baseUrl}}"],
+              "path": ["games", "available"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-11-13"
+                }
+              ]
+            },
+            "description": "MANDATORY TEST 3: Game 14 booking ended on 2026-11-12, so on 2026-11-13 it MUST appear in the available list."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('MANDATORY TEST 3: Status code is 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('MANDATORY TEST 3: Game 14 IS present in available games list', function () {",
+                  "    var games = pm.response.json();",
+                  "    pm.expect(games).to.be.an('array');",
+                  "    var game14 = games.find(function(g) { return g.id === 14; });",
+                  "    pm.expect(game14).to.not.be.undefined;",
+                  "    pm.expect(game14.name).to.eql('Game 14');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
