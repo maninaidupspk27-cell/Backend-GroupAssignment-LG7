@@ -1,22 +1,29 @@
-const app = require('../server');
-const { initDb } = require('../database/db');
+let app;
+let loadError = null;
 
-let initPromise = null;
+try {
+  app = require('../server');
+} catch (err) {
+  loadError = err;
+  console.error('Failed to load server module:', err);
+}
 
-// Export as Vercel Serverless Function with safe initialization & error handling
 module.exports = async (req, res) => {
+  if (loadError) {
+    return res.status(500).json({
+      error: 'Module Load Error on Vercel',
+      message: loadError.message,
+      stack: loadError.stack
+    });
+  }
+
   try {
-    if (!initPromise) {
-      initPromise = initDb();
-    }
-    await initPromise;
     return app(req, res);
   } catch (err) {
-    console.error('Vercel serverless error:', err);
     return res.status(500).json({
-      error: 'Vercel Serverless Function Error',
+      error: 'Runtime Error on Vercel',
       message: err.message,
-      stack: process.env.NODE_ENV === 'production' ? undefined : err.stack
+      stack: err.stack
     });
   }
 };
