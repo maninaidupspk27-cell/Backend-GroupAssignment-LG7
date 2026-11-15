@@ -3,7 +3,15 @@
 > **Backend Development Fundamentals · Group Assignment**  
 > **Course Unit:** BDF Modules 1 to 3 · Card 112 of 375 · Theme 22: Board Games  
 > **Group Identifier:** YG-CSEDS2B-G07  
-> **Repository:** [Backend-GroupAssignment-LG7](https://github.com/maninaidupspk27-cell/Backend-GroupAssignment-LG7)
+> **Repository:** [Backend-GroupAssignment-LG7](https://github.com/maninaidupspk27-cell/Backend-GroupAssignment-LG7)  
+>
+> ### Team Members & Registration Numbers:
+> 1. **SIVA SANKAR MAHAPATRO** – `252U1R3090` (Member 1: Server and Routes)
+> 2. **AYYAPPA SONTI** – `252U1R3091` (Member 2: Database Architecture)
+> 3. **VISHWAPATHI ARAVINDH** – `252U1R3102` (Member 3: REST Endpoints & SQL JOIN)
+> 4. **RAVURI NUTHAN CHIRANJEEVI** – `252U1R3090` (Member 4: Input Validation & Search)
+> 5. **SAMBANGI NIKHIL** – `252U1R3066` (Member 5: Special Twist Rule - Free On This Date)
+> 6. **SINGAMSETTY MANIKANTA** – `252U1R3087` (Member 6: Postman, README & Project Lead)
 
 ---
 
@@ -336,18 +344,101 @@ A ready-to-import Postman Collection is provided in the `postman/` directory:
 
 ---
 
-## 13. Division of Work – Six Team Members
+## 13. Division of Work – Six Team Members & Instructor Presentation Paths
 
-Our team (Group 7: YG-CSEDS2B-G07) divided the project across 6 defined responsibilities:
+Our team (Group 7: YG-CSEDS2B-G07) divided the project across 6 defined responsibilities. Each team member has specific files and code paths to demonstrate to the instructor during the live evaluation:
 
-| Member | Role | Core Deliverables & Contributions | Suggested Git Commit |
-| :--- | :--- | :--- | :--- |
-| **Member 1** | **Server and Routes** | Node & Express configuration, `server.js`, 404/500 middleware, route mounting, port binding | `feat(server): setup express server, middleware, and route mounting` |
-| **Member 2** | **Database Architecture** | SQLite database schema (`schema.sql`), connection & pragma helper (`db.js`), 96-record seeder (`seed.js`) | `feat(database): implement sqlite schema, foreign keys, and seed script` |
-| **Member 3** | **REST Endpoints** | Guest & Game CRUD controllers, booking handlers, and `GET /bookings/details` SQL JOIN endpoint | `feat(controllers): implement guest, game, and booking CRUD & join endpoints` |
-| **Member 4** | **Validation & Search** | Input validation middleware (`validation.js`), email format/uniqueness, capacity search (`GET /games?players=4`) | `feat(middleware): add input validation and player capacity search` |
-| **Member 5** | **Special Twist Rule** | Free on this date logic (`GET /games/available?date=YYYY-MM-DD`), date overlap prevention, and 3 mandatory test cases | `feat(twist): implement free on this date rule and mandatory test suite` |
-| **Member 6** | **Postman & Documentation** | 18-request Postman test suite (`postman/BookNook.postman_collection.json`), `README.md`, setup instructions & demo guide | `docs: add comprehensive postman test suite, readme, and beginner guide` |
+| Member & Reg No. | Assigned Role | Presentation File Paths | What to Present to the Instructor | Git Commit |
+| :--- | :--- | :--- | :--- | :--- |
+| **SIVA SANKAR MAHAPATRO**<br>`252U1R3090` | **Member 1: Server and Routes** | • `server.js`<br>• `routes/guestRoutes.js`<br>• `routes/gameRoutes.js`<br>• `routes/bookingRoutes.js` | Express app configuration, `express.json()` middleware, route mounting (`/guests`, `/games`, `/bookings`), 404 & 500 error handlers, and route ordering (`/games/available` before `/:id`). | `feat(server): setup express server, middleware, and route mounting` |
+| **AYYAPPA SONTI**<br>`252U1R3091` | **Member 2: Database Architecture** | • `database/schema.sql`<br>• `database/db.js`<br>• `database/seed.js` | 3 related SQLite tables, foreign key constraints (`PRAGMA foreign_keys = ON;`), ON DELETE RESTRICT rules, 96-record automatic seeding script, and mandatory Game 14 verification. | `feat(database): implement sqlite schema, foreign keys, and seed script` |
+| **VISHWAPATHI ARAVINDH**<br>`252U1R3102` | **Member 3: REST Endpoints & SQL JOIN** | • `controllers/guestController.js`<br>• `controllers/gameController.js`<br>• `controllers/bookingController.js` | Guest & Game CRUD operations (`GET`, `POST`, `PUT`, `DELETE`), safe deletion checks (blocking deletion if bookings exist), and `GET /bookings/details` multi-table SQL `INNER JOIN`. | `feat(controllers): implement guest, game, and booking CRUD & join endpoints` |
+| **RAVURI NUTHAN CHIRANJEEVI**<br>`252U1R3090` | **Member 4: Input Validation & Search** | • `middleware/validation.js`<br>• `controllers/gameController.js` | Required fields and regex email checks, positive player integer limits (`min_players <= max_players`), and player capacity search endpoint (`GET /games?players=4`). | `feat(middleware): add input validation and player capacity search` |
+| **SAMBANGI NIKHIL**<br>`252U1R3066` | **Member 5: Special Twist Rule (Free on this date)** | • `controllers/gameController.js` (`getAvailableGames`)<br>• `middleware/validation.js` (`validateBooking`)<br>• `test.js` (Twist tests 1, 2, 3) | "Free on this date" SQL logic (`WHERE id NOT IN (SELECT game_id FROM bookings...)`), date overlap check, and live demonstration of the 3 mandatory twist tests. | `feat(twist): implement free on this date rule and mandatory test suite` |
+| **SINGAMSETTY MANIKANTA**<br>`252U1R3087` (Lead) | **Member 6: Postman Suite, README & Lead** | • `postman/BookNook.postman_collection.json`<br>• `README.md`<br>• `package.json`<br>• `test.js` | Complete 18-request Postman test collection with JavaScript assertions, automated testing runner (`npm test`), comprehensive documentation, and team coordination. | `docs: add comprehensive postman test suite, readme, and beginner guide` |
+
+---
+
+### Instructor Presentation Guide by Member
+
+#### 1. SIVA SANKAR MAHAPATRO (252U1R3090) – Server and Routes
+- **Files to open:** `server.js` and `routes/gameRoutes.js`
+- **Lines to highlight in `server.js`:**
+  - Lines 14: `app.use(express.json());` (Parsing JSON bodies)
+  - Lines 41-43: Route mounting for `/guests`, `/games`, and `/bookings`
+  - Lines 46-59: 404 Route Not Found and 500 Global Error Handler
+- **Lines to highlight in `routes/gameRoutes.js`:**
+  - Lines 14-18: Why `router.get('/available', ...)` is placed **above** `router.get('/:id', ...)` so Express does not treat `"available"` as an ID.
+- **Viva Answer:** *"Express evaluates route paths sequentially from top to bottom. If `/games/:id` were declared first, Express would capture the string 'available' as `:id`, routing the request to `getGameById` instead of `getAvailableGames`."*
+
+#### 2. AYYAPPA SONTI (252U1R3091) – Database Architecture
+- **Files to open:** `database/schema.sql` and `database/seed.js`
+- **Lines to highlight in `database/schema.sql`:**
+  - Line 2: `PRAGMA foreign_keys = ON;`
+  - Lines 37-38: Foreign keys `guest_id REFERENCES guests(id)` and `game_id REFERENCES games(id) ON DELETE RESTRICT`
+- **Lines to highlight in `database/seed.js`:**
+  - Lines 125-151: Use of `INSERT OR IGNORE` to ensure idempotent seeding without duplicating rows
+  - Lines 160-164: Seeding verification report printing 32 guests, 32 games, and 32 bookings (96 total records)
+  - Lines 166-179: Verification of mandatory Game 14 and its seed booking (Nov 10 to Nov 12)
+- **Live Terminal Command to Run:** `npm run seed`
+- **Viva Answer:** *"SQLite disables foreign key constraints by default for backward compatibility with older applications. We enforce `PRAGMA foreign_keys = ON;` on initialization to ensure database-level referential integrity."*
+
+#### 3. VISHWAPATHI ARAVINDH (252U1R3102) – REST Endpoints & SQL JOIN
+- **Files to open:** `controllers/bookingController.js` and `controllers/guestController.js`
+- **Lines to highlight in `controllers/bookingController.js`:**
+  - Lines 44-55: The `GET /bookings/details` multi-table `INNER JOIN` query:
+    ```sql
+    SELECT b.id AS booking_id, gu.name AS guest_name, ga.name AS game_name, b.start_date, b.end_date
+    FROM bookings b
+    INNER JOIN guests gu ON b.guest_id = gu.id
+    INNER JOIN games ga ON b.game_id = ga.id
+    ORDER BY b.id ASC;
+    ```
+- **Lines to highlight in `controllers/guestController.js`:**
+  - Lines 110-119: Safe deletion check preventing deletion of any guest who has active bookings (`409 Conflict`).
+- **Live Endpoint to Test:** `GET http://localhost:3000/bookings/details`
+- **Viva Answer:** *"An `INNER JOIN` matches foreign keys between `bookings`, `guests`, and `games`. This lets us return human-readable guest and game names to cafe staff instead of arbitrary numeric IDs."*
+
+#### 4. RAVURI NUTHAN CHIRANJEEVI (252U1R3090) – Input Validation & Search
+- **Files to open:** `middleware/validation.js` and `controllers/gameController.js`
+- **Lines to highlight in `middleware/validation.js`:**
+  - Lines 22-38: Name and email presence, regex validation (`EMAIL_REGEX`), and email uniqueness check (`409 Conflict`)
+  - Lines 88-115: Game validation checking `min_players > 0`, `max_players >= min_players`, and `duration > 0`
+- **Lines to highlight in `controllers/gameController.js`:**
+  - Lines 20-28: Search query logic for `GET /games?players=4`:
+    ```sql
+    WHERE min_players <= ? AND max_players >= ?
+    ```
+- **Live Endpoint to Test:** `GET http://localhost:3000/games?players=4`
+- **Viva Answer:** *"Our search endpoint checks if a party of guests falls within the supported range of the game: `min_players <= players AND max_players >= players`. If an invalid string like `?players=abc` is passed, we return `400 Bad Request`."*
+
+#### 5. SAMBANGI NIKHIL (252U1R3066) – Special Twist Rule (Free on this date)
+- **Files to open:** `controllers/gameController.js` and `middleware/validation.js`
+- **Lines to highlight in `controllers/gameController.js`:**
+  - Lines 51-61: The SQL exclusion subquery:
+    ```sql
+    SELECT * FROM games
+    WHERE id NOT IN (
+      SELECT game_id FROM bookings
+      WHERE start_date <= ? AND end_date >= ?
+    ) ORDER BY id ASC;
+    ```
+- **Lines to highlight in `middleware/validation.js`:**
+  - Lines 184-186: Date ordering check returning exact string: `"End date cannot be before start date."`
+- **Live Demonstration of the 3 Mandatory Tests:**
+  1. `POST /bookings` with `start_date: 2026-11-12`, `end_date: 2026-11-10` $\to$ Returns `400 Bad Request`
+  2. `GET /games/available?date=2026-11-11` $\to$ Returns `200 OK`, **Game 14 is NOT in the list**
+  3. `GET /games/available?date=2026-11-13` $\to$ Returns `200 OK`, **Game 14 IS in the list**
+- **Viva Answer:** *"Both start and end dates are inclusive. On Nov 11, Game 14 is active (`2026-11-10 <= 2026-11-11 <= 2026-11-12`), so the subquery catches it and `NOT IN` excludes it. On Nov 13, the booking has ended, so Game 14 is returned as free."*
+
+#### 6. SINGAMSETTY MANIKANTA (252U1R3087) – Postman Suite, README & Project Lead
+- **Files to open:** `postman/BookNook.postman_collection.json`, `test.js`, and `README.md`
+- **Things to show the Instructor:**
+  - Run the automated test suite in terminal: `npm test` (all 22 tests pass)
+  - Open Postman, show the **"BookNook Cafe API Testing"** collection with 18 requests organized in folders (Guests, Games, Bookings, Special Twist)
+  - Run the Postman Collection Runner to show 18 green `PASS` checkmarks
+  - Show the Git commit history with 6 individual member commits pushed to GitHub
+- **Viva Answer:** *"We created automated test scripts inside Postman using `pm.test` to verify HTTP status codes (200, 201, 400, 404, 409) and data payload integrity, ensuring continuous verification across our entire REST API."*
 
 ---
 
