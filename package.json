@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "BookNook Cafe - Board Game Booking Management System (Backend Fundamentals)",
   "main": "server.js",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
+    "build": "npm rebuild sqlite3 && node database/seed.js",
     "seed": "node database/seed.js",
     "test": "node test.js"
   },
