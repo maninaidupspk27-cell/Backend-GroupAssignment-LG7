@@ -4,6 +4,7 @@
 > **Course Unit:** BDF Modules 1 to 3 · Card 112 of 375 · Theme 22: Board Games  
 > **Group Identifier:** YG-CSEDS2B-G07  
 > **Repository:** [Backend-GroupAssignment-LG7](https://github.com/maninaidupspk27-cell/Backend-GroupAssignment-LG7)  
+> **Live API URL:** [https://booknook-cafe-z8sk.onrender.com](https://booknook-cafe-z8sk.onrender.com)  
 >
 > ### Team Members & Registration Numbers:
 > 1. **SIVA SANKAR MAHAPATRO** – `252U1R3090` (Member 1: Server and Routes)
