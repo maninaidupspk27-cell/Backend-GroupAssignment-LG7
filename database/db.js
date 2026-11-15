@@ -2,8 +2,14 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = path.join(__dirname, 'booknook.db');
+// Support Vercel Serverless environment:
+// Root filesystem is read-only on Vercel; use /tmp for SQLite database storage.
+let DB_PATH = path.join(__dirname, 'booknook.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
+
+if (process.env.VERCEL) {
+  DB_PATH = path.join('/tmp', 'booknook.db');
+}
 
 // Initialize database connection
 const db = new sqlite3.Database(DB_PATH, (err) => {
@@ -24,11 +30,25 @@ function initDb() {
   return new Promise((resolve, reject) => {
     try {
       const schemaSql = fs.readFileSync(SCHEMA_PATH, 'utf-8');
-      db.exec(schemaSql, (err) => {
+      db.exec(schemaSql, async (err) => {
         if (err) {
           console.error('[-] Error executing schema.sql:', err.message);
           return reject(err);
         }
+
+        // On Vercel serverless cold start, auto-seed the database if tables are empty
+        if (process.env.VERCEL) {
+          try {
+            const countRow = await query.get('SELECT COUNT(*) AS count FROM games');
+            if (!countRow || countRow.count < 30) {
+              const { seedDatabase } = require('./seed');
+              await seedDatabase();
+            }
+          } catch (seedErr) {
+            console.error('[-] Vercel auto-seed notification:', seedErr.message);
+          }
+        }
+
         resolve();
       });
     } catch (readErr) {
